@@ -3,6 +3,7 @@ import time
 import Queue
 import random
 import sys
+import MySQLdb as mdb
 #import serial
 
 
@@ -19,7 +20,7 @@ def sim_collectData(input_queue, stop_event):
     n = 0
     while not stop_event.is_set():
         input_queue.put("DATA: <here are some random data> " + str(n))
-        stop_event.wait(0.001)
+        stop_event.wait(random.randint(1,6))
         n += 1
     input_queue.put(None) # send a signal telling the logging thread we're done
     print "[collection thread] Terminated data collection."
@@ -29,8 +30,6 @@ def sim_collectData(input_queue, stop_event):
 def logData(input_queue):
     n = 0
 
-    # if the stop event is recieved and the previous loop terminates, 
-    # finish logging the rest of the items in the queue.
     while True:
         d = input_queue.get()
         if d is None:
