@@ -2,6 +2,7 @@ import threading
 import time
 import Queue
 import random
+import string
 import sys
 import MySQLdb as mdb
 #import serial
@@ -17,46 +18,67 @@ def sim_collectData(input_queue, stop_event):
     ''' this provides some output simulating the serial
     data from the data logging hardware. 
     '''
-    n = 0
     while not stop_event.is_set():
-        input_queue.put("DATA: <here are some random data> " + str(n))
-        stop_event.wait(random.randint(1,6))
-        n += 1
+        # generate a random string
+        lst = [random.choice(string.ascii_letters) for n in xrange(random.randint(15,40))]
+        data = "".join(lst)
+            
+        input_queue.put("DATA:" + data)
+
+        # wait a random time
+        stop_event.wait(random.randint(1,5))
+
     input_queue.put(None) # send a signal telling the logging thread we're done
     print "[collection thread] Terminated data collection."
     return
 
 
 def logData(input_queue):
-    n = 0
-
+    
+    # make the database connection
+    try:
+        con = mdb.connect('localhost', 'edatauser', 'wibble23wobble', 'edata');
+        cur = con.cursor()
+    except mdb.Error, e:
+        print "Error %d: %s" % (e.args[0],e.args[1])
+        sys.exit(1)
+    
+    # log the data
     while True:
         d = input_queue.get()
         if d is None:
             input_queue.task_done()
             print "[logging thread] Finished logging."
+            con.close()
             return
+ 
         if d.startswith("DATA:"):
-            print "[logging thread] Logged to DB: " + d
-            input_queue.task_done()
-            n += 1
+            data = d[4:] # remove 'DATA:'
+            sql_query = "INSERT INTO example(data) VALUES('%s')" % data
+            with con:
+                cur = con.cursor(mdb.cursors.DictCursor)
+                cur.execute(sql_query)
+                input_queue.task_done()
 
 
 def main():
     input_queue = Queue.Queue()
-    
-    stop_event = threading.Event() # used to signal termination to the thread
-    
+ 
+# used to signal termination to the thread
+    stop_event = threading.Event() 
+
+# start the logging and data collection threads    
     print "[main] Starting data collection thread...",
     collection_thread = threading.Thread(target=sim_collectData, args=(input_queue, stop_event))
     collection_thread.start()
     print "Done."
 
     print "[main] Starting logging thread...",
-    logging_thread = threading.Thread(target=logData, args=(input_queue, ))
+    logging_thread = threading.Thread(target=logData, args=(input_queue,))
     logging_thread.start()
     print "Done."
 
+# listen for keyboard interrupts
     try:
         while True:
             time.sleep(10)
@@ -65,5 +87,5 @@ def main():
         stop_event.set()
         collection_thread.join()
         logging_thread.join()
-
+        
 main()
