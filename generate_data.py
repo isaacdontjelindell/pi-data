@@ -1,6 +1,7 @@
 import serial
 import time
 import random
+import string
 
 def main():
     ser = serial.Serial()
