@@ -1,5 +1,6 @@
 import serial
 import time
+import random
 
 def main():
     ser = serial.Serial()
@@ -14,9 +15,13 @@ def main():
     print ser.isOpen()
 
     while True:
+        # generate a random string
+        lst = [random.choice(string.ascii_letters) for n in xrange(random.randint(15,40))]
+        data = "".join(lst)
+
         print "Writing data...",
-        ser.write("DATA: blah blah blah blah\r\n")
+        ser.write(data)
         print "Done"
-        time.sleep(2)
+        time.sleep(random.randint(1, 6))
 
 main()
