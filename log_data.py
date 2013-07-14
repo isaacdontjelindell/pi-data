@@ -29,7 +29,7 @@ def collectData(input_queue, stop_event):
     print "[collection thread] Done."
 
     while not stop_event.is_set():
-        data = ser.read()
+        data = ser.readline()
         print data
 
     input_queue.put(None) # send a signal telling the logging thread we're done
