@@ -1,5 +1,5 @@
 import serial
-
+import time
 
 def main():
     ser = serial.Serial()
@@ -13,5 +13,10 @@ def main():
     ser.open()
     print ser.isOpen()
 
+    while True:
+        print "Writing data...",
+        ser.write("DATA: blah blah blah blah\r\n")
+        print "Done"
+        time.sleep(2)
 
 main()
