@@ -8,16 +8,9 @@ import MySQLdb as mdb
 from datetime import datetime
 import serial
 
-
-## TODO serial stuff - have to figure out some way of simming ##
-#serialport = serial.Serial("/dev/ttyS0", 57600, timeout=0.5)
-#serialport.write("write some data here?")
-#response = serialport.readlines(None)
-#print response
-
 def collectData(input_queue, stop_event):
     ser = serial.Serial()
-    ser.port = '/dev/ttyAMA0'
+    ser.port = "/dev/ttyAMA0"
     ser.baudrate = 57600
     ser.bytesize = serial.EIGHTBITS
     ser.parity = serial.PARITY_NONE
@@ -31,7 +24,8 @@ def collectData(input_queue, stop_event):
     while not stop_event.is_set():
         data = ser.readline()
         if data:
-            print data
+            data = data.strip("\r\n")
+            input_queue.put(data)
 
     input_queue.put(None) # send a signal telling the logging thread we're done
     print "[collection thread] Terminated data collection."
