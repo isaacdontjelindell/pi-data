@@ -5,6 +5,7 @@ import random
 import string
 import sys
 import MySQLdb as mdb
+from datetime import datetime
 #import serial
 
 
@@ -54,7 +55,9 @@ def logData(input_queue):
  
         if d.startswith("DATA:"):
             data = d[4:] # remove 'DATA:'
-            sql_query = "INSERT INTO example(data) VALUES('%s')" % data
+            timestamp = datetime.now()
+            sql_query = '''INSERT INTO example(data, remotedatetime, uploaded) 
+                               VALUES('%s', '%s', '%s')''' % (data, timestamp, '0')
             with con:
                 cur = con.cursor(mdb.cursors.DictCursor)
                 cur.execute(sql_query)
