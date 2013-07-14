@@ -19,10 +19,11 @@ def main():
         # generate a random string
         lst = [random.choice(string.ascii_letters) for n in xrange(random.randint(15,40))]
         data = "".join(lst)
+        data = "DATA:" + data
 
-        print "Writing data...",
+        print "Writing data...", data
+        data = data + "\r\n"
         ser.write(data)
-        print "Done"
         time.sleep(random.randint(1, 6))
 
 main()
