@@ -22,7 +22,7 @@ def collectData(input_queue, stop_event):
     ser.bytesize = serial.EIGHTBITS
     ser.parity = serial.PARITY_NONE
     ser.stopbits = serial.STOPBITS_ONE
-    ser.timeout = None  # reads will be blocking...good
+    ser.timeout = 1 
     
     print "[collection thread] Opening serial port..."
     ser.open()
