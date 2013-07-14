@@ -6,7 +6,7 @@ import string
 import sys
 import MySQLdb as mdb
 from datetime import datetime
-#import serial
+import serial
 
 
 ## TODO serial stuff - have to figure out some way of simming ##
@@ -14,6 +14,28 @@ from datetime import datetime
 #serialport.write("write some data here?")
 #response = serialport.readlines(None)
 #print response
+
+def collectData(input_queue, stop_event):
+    ser = serial.Serial()
+    ser.port = '/dev/ttyAMA0'
+    ser.baudrate = 57600
+    ser.bytesize = serial.EIGHTBITS
+    ser.parity = serial.PARITY_NONE
+    ser.stopbits = serial.STOPBITS_ONE
+    ser.timeout = None  # reads will be blocking...good
+    
+    print "[collection thread] Opening serial port..."
+    ser.open()
+    print "[collection thread] Done."
+
+    while not stop_event.is_set():
+        data = ser.read()
+        print data
+
+    input_queue.put(None) # send a signal telling the logging thread we're done
+    print "[collection thread] Terminated data collection."
+    return
+    
 
 def sim_collectData(input_queue, stop_event):
     ''' this provides some output simulating the serial
@@ -71,15 +93,15 @@ def main():
     stop_event = threading.Event() 
 
 # start the logging and data collection threads    
-    print "[main] Starting data collection thread...",
-    collection_thread = threading.Thread(target=sim_collectData, args=(input_queue, stop_event))
+    print "[main] Starting data collection thread..."
+    collection_thread = threading.Thread(target=collectData, args=(input_queue, stop_event))
     collection_thread.start()
-    print "Done."
+    print "[main] Done."
 
-    print "[main] Starting logging thread...",
+    print "[main] Starting logging thread..."
     logging_thread = threading.Thread(target=logData, args=(input_queue,))
     logging_thread.start()
-    print "Done."
+    print "[main] Done."
 
 # listen for keyboard interrupts
     try:
