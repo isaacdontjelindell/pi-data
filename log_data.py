@@ -30,26 +30,6 @@ def collectData(input_queue, stop_event):
     input_queue.put(None) # send a signal telling the logging thread we're done
     print "[collection thread] Terminated data collection."
     return
-    
-
-def sim_collectData(input_queue, stop_event):
-    ''' this provides some output simulating the serial
-    data from the data logging hardware. 
-    '''
-    while not stop_event.is_set():
-        # generate a random string
-        lst = [random.choice(string.ascii_letters) for n in xrange(random.randint(15,40))]
-        data = "".join(lst)
-            
-        input_queue.put("DATA:" + data)
-
-        # wait a random time
-        stop_event.wait(random.randint(1,5))
-
-    input_queue.put(None) # send a signal telling the logging thread we're done
-    print "[collection thread] Terminated data collection."
-    return
-
 
 def logData(input_queue):
     
