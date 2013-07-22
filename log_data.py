@@ -32,8 +32,7 @@ def collectData(input_queue, stop_event):
 def logData(input_queue):
     # make the database connection
     try:
-        con = mdb.connect('localhost', 'edatauser', 'wibble23wobble', 'edata');
-        cur = con.cursor()
+        con = mdb.connect('localhost', 'edatauser', 'wibble23wobble', 'edata')
     except mdb.Error, e:
         print "Error %d: %s" % (e.args[0],e.args[1])
         sys.exit(1)
