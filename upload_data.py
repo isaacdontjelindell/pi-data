@@ -1,3 +1,5 @@
+#!/usr/local/bin/python
+
 import MySQLdb as mdb
 import sys
 import requests
@@ -13,7 +15,7 @@ def main():
         print "Error %d: %s" % (e.args[0],e.args[1])
         sys.exit(1)
 
-    sql_query = '''SELECT * FROM example WHERE uploaded = 0 AND id=2'''
+    sql_query = '''SELECT * FROM example WHERE uploaded = 0'''
     with con:
         cur = con.cursor(mdb.cursors.DictCursor)
         cur.execute(sql_query)
@@ -25,13 +27,14 @@ def main():
                    'data':record['data'],
                    'remotedatetime':record['remotedatetime']}
         response = requests.post(HOST, data=payload)
-        print response.status_code
 
         if response.status_code == 200:
             sql = ''' UPDATE example SET uploaded = 1 WHERE id = %s ''' % record['id']
             with con:
                 cur = con.cursor(mdb.cursors.DictCursor)
                 cur.execute(sql)
+        else:
+            print "POST request for record with id = %s failed!" % record['id']
     con.close()
 
 main()
