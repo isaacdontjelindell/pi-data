@@ -26,15 +26,19 @@ def main():
                    'password':PW,
                    'data':record['data'],
                    'remotedatetime':record['remotedatetime']}
-        response = requests.post(HOST, data=payload)
+        try:
+            response = requests.post(HOST, data=payload)
 
-        if response.status_code == 200:
-            sql = ''' UPDATE example SET uploaded = 1 WHERE id = %s ''' % record['id']
-            with con:
-                cur = con.cursor(mdb.cursors.DictCursor)
-                cur.execute(sql)
-        else:
-            print "POST request for record with id = %s failed!" % record['id']
+            if response.status_code == 200:
+                sql = ''' UPDATE example SET uploaded = 1 WHERE id = %s ''' % record['id']
+                with con:
+                    cur = con.cursor(mdb.cursors.DictCursor)
+                    cur.execute(sql)
+            else:
+                print "POST request for record with id = %s failed!" % record['id']
+        except:
+            print "Something wicked happened with the POST request!"
+
     con.close()
 
 main()
