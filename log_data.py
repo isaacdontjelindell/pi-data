@@ -5,6 +5,8 @@ import sys
 import MySQLdb as mdb
 from datetime import datetime
 import serial
+import random
+import string
 
 def collectData(input_queue, stop_event):
     ser = serial.Serial()
