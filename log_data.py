@@ -1,8 +1,6 @@
 import threading
 import time
 import Queue
-import random
-import string
 import sys
 import MySQLdb as mdb
 from datetime import datetime
@@ -32,7 +30,6 @@ def collectData(input_queue, stop_event):
     return
 
 def logData(input_queue):
-    
     # make the database connection
     try:
         con = mdb.connect('localhost', 'edatauser', 'wibble23wobble', 'edata');
