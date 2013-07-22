@@ -85,7 +85,7 @@ def main():
 
 # start the logging and data collection threads    
     print "[main] Starting data collection thread..."
-    collection_thread = threading.Thread(target=sim_collectData, args=(input_queue, stop_event))
+    collection_thread = threading.Thread(target=collectData, args=(input_queue, stop_event))
     collection_thread.start()
     print "[main] Done."
 
