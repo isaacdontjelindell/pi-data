@@ -25,7 +25,10 @@ def collectData(input_queue, stop_event):
         data = ser.readline()
         if data:
             data = data.strip("\r\n")
-            input_queue.put(data)
+            if data.startswith('LOOPBACK'):
+                ser.write("LOOPBACK TEST: " + str(datetime.now()) + "\r\n")
+            else:
+                input_queue.put(data)
 
     input_queue.put(None) # send a signal telling the logging thread we're done
     print "[collection thread] Terminated data collection."
