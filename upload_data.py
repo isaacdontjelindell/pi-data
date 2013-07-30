@@ -3,6 +3,8 @@
 import MySQLdb as mdb
 import sys
 import requests
+import fcntl
+import time
 
 USERNAME = 'testuser'
 PW = 'summerD82'
@@ -41,4 +43,10 @@ def main():
 
     con.close()
 
-main()
+if __name__ == '__main__':
+    f = open ('lock', 'w')
+    try: fcntl.lockf (f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except IOError:
+        sys.stderr.write ('[%s] Upload job already running.\n' % time.strftime ('%c') )
+        sys.exit (-1)
+    main()
